@@ -8,44 +8,61 @@ use App\Connection\DatabaseConnection;
 use App\Model\Categoria;
 use PDO;
 
-class CategoriaRepository implements RepositoryInterface
+class CategoriaRepository 
 {
+    public const TABLE = 'tb_categorias';
 
-    public const TABLE = "tb_categorias";
+    public PDO $pdo;
+
+    public function __construct()
+    {
+        $this->pdo =  DatabaseConnection::abrirConexao();
+    }
 
     public function buscarTodos(): iterable
     {
-        $conexao = DatabaseConnection::abrirConexao();
+        $sql = 'SELECT * FROM ' . self::TABLE;
+        
+        $query = $this->pdo->query($sql);
+    
+        $query->execute(); 
 
-        $sql = "SELECT * FROM ".self::TABLE;
-
-        $query = $conexao->query($sql);
-
-        $query->execute();
-
-        return $query->fetchAll(PDO::FETCH_CLASS, Categoria::class);
+        return $query->fetchAll(PDO::FETCH_CLASS, Categoria::class); 
     }
 
-    public function buscarUm(string $id): ?object
+    public function buscarUm(string $id): object
     {
-        return new \stdClass();
+        $sql = "SELECT * FROM ".self::TABLE." WHERE id = '{$id}'";
+        $query = $this->pdo->query($sql);
+        $query->execute();
+        return $query->fetchObject(Categoria::class); 
     }
 
     public function inserir(object $dados): object
     {
-        return $dados;
-    } 
 
-    public function atualizar(object $dados, string $id): object
-    {
+        $sql = "INSERT INTO " . self::TABLE . 
+            "(nome) " .  "VALUES ('{$dados->nome}');";
+
+        $this->pdo->query($sql);
+
         return $dados;
+    }
+
+    public function atualizar(object $novosDados, string $id): object
+    {
+        $sql = "UPDATE " . self::TABLE . 
+            " SET nome='{$novosDados->nome}' WHERE id = '{$id}';";
+                
+        $this->pdo->query($sql);
+
+        return $novosDados;
     }
 
     public function excluir(string $id): void
     {
-        $conexao = DatabaseConnection::abrirConexao();
         $sql = "DELETE FROM ".self::TABLE." WHERE id = '{$id}'";
-        $query = $conexao->query($sql);
+        $query = $this->pdo->query($sql);
         $query->execute();
     }
 }
