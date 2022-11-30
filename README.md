@@ -84,3 +84,6 @@ Para executar e testar a aplicação, dentro do terminal execute:
 `php -S localhost:8000 -t public`
 
 Agora acesse o endereço http://localhost:8000 em seu navegador
+
+### Fazendo o login
+usando o login e a senha criada voce entra com o *email* - *admin@gmail.com* e *senha* - *123456*.
